@@ -10,16 +10,16 @@
 eigen3/Eigen/Eigen
 -
 
-/home/zwt/homework/ComputerGraphics/GAMES101/Assignment1/代码框架/rasterizer.cpp
-algorithm
--
+/home/zwt/homework/ComputerGraphics/GAMES101/Assignment1/代码框架/main.cpp
+Triangle.hpp
+/home/zwt/homework/ComputerGraphics/GAMES101/Assignment1/代码框架/Triangle.hpp
 rasterizer.hpp
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment1/代码框架/rasterizer.hpp
+eigen3/Eigen/Eigen
+-
+iostream
+-
 opencv2/opencv.hpp
--
-math.h
--
-stdexcept
 -
 
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment1/代码框架/rasterizer.hpp

@@ -6,12 +6,12 @@
 
 constexpr double MY_PI = 3.1415926;
 
-// ��z����ת����
+// 绕z轴旋转矩阵
 Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
     Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
     
-    float radians = rotation_angle * M_PI / 180.0; // ���Ƕ�ת��Ϊ����
+    float radians = rotation_angle * M_PI / 180.0; // 将角度转换为弧度
 
     model << cos(radians), -sin(radians), 0, 0,
              sin(radians),  cos(radians), 0, 0,
@@ -19,6 +19,28 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
              0,             0,            0, 1;
 
     return model;
+}
+
+// 绕任意轴旋转矩阵
+Eigen::Matrix4f get_rotation(Vector3f axis, float angle)
+{
+    Eigen::Matrix4f RotationMat = Eigen::Matrix4f::Identity();
+    Eigen::Matrix3f I = Eigen::Matrix3f::Identity();
+    Eigen::Matrix3f R;
+    Eigen::Matrix3f N;
+
+    N << 0, -axis[2], axis[1],
+         axis[2], 0, -axis[0],
+        -axis[1], axis[0], 0;
+
+    float radians = angle * M_PI / 180.0; // 将角度转换为弧度
+
+    R = cos(radians) * I + (1 - cos(radians))* axis * axis.transpose() + sin(radians) * N;
+
+    // 将3x3旋转矩阵填入4x4矩阵中
+    RotationMat.block<3, 3>(0, 0) = R;
+
+    return RotationMat;
 }
 
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
@@ -70,11 +92,11 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
     return projection;
 }
 
-
-
 int main(int argc, const char** argv)
 {
     float angle = 0;
+    Vector3f axis = {1, 0, 0};
+
     bool command_line = false;
     std::string filename = "output.png";
     std::cout << argc <<std::endl;
@@ -88,7 +110,6 @@ int main(int argc, const char** argv)
         // else
         //     return 0;
     }
-
 
     rst::rasterizer r(700, 700);
 
@@ -107,7 +128,8 @@ int main(int argc, const char** argv)
     if (command_line) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
-        r.set_model(get_model_matrix(angle));
+        // r.set_model(get_model_matrix(angle));
+        r.set_model(get_rotation(axis, angle));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
@@ -123,7 +145,8 @@ int main(int argc, const char** argv)
     while (key != 27) {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
-        r.set_model(get_model_matrix(angle));
+        // r.set_model(get_model_matrix(angle));
+        r.set_model(get_rotation(axis, angle));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
