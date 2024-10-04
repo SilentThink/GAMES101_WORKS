@@ -99,5 +99,8 @@ namespace rst
 
         int next_id = 0;
         int get_next_id() { return next_id++; }
+
+        const int N = 2;
+        std::vector< std::vector<std::pair<float, Eigen::Vector3f>> > depColor; 
     };
 }
