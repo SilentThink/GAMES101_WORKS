@@ -24,22 +24,12 @@ eigen3/Eigen/Eigen
 Texture.hpp
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/Texture.hpp
 
-/home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/Texture.cpp
-
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/Texture.hpp
 global.hpp
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/global.hpp
 eigen3/Eigen/Eigen
 -
 opencv2/opencv.hpp
--
-
-/home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/Triangle.cpp
-Triangle.hpp
-/home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/Triangle.hpp
-algorithm
--
-array
 -
 
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/Triangle.hpp
@@ -67,16 +57,6 @@ Texture.hpp
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/Texture.hpp
 OBJ_Loader.h
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/OBJ_Loader.h
-
-/home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/rasterizer.cpp
-algorithm
--
-rasterizer.hpp
-/home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/rasterizer.hpp
-opencv2/opencv.hpp
--
-math.h
--
 
 /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/rasterizer.hpp
 eigen3/Eigen/Eigen

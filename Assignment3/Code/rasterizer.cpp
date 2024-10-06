@@ -7,6 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include <math.h>
 
+const bool SSAA = false;
 
 rst::pos_buf_id rst::rasterizer::load_positions(const std::vector<Eigen::Vector3f> &positions)
 {
@@ -173,13 +174,14 @@ static std::tuple<float, float, float> computeBarycentric2D(float x, float y, co
 void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
 
     float f1 = (50 - 0.1) / 2.0;
-    float f2 = (50 + 0.1) / 2.0;
+    float f2 = -(50 + 0.1) / 2.0;
 
     Eigen::Matrix4f mvp = projection * view * model;
     for (const auto& t:TriangleList)
     {
         Triangle newtri = *t;
 
+        // 取得三维空间中的坐标（还未投影到屏幕空间）
         std::array<Eigen::Vector4f, 3> mm {
                 (view * model * t->v[0]),
                 (view * model * t->v[1]),
@@ -204,6 +206,7 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
             vec.z()/=vec.w();
         }
 
+        // 采用逆转置矩阵将法向量从世界空间转换到视角空间
         Eigen::Matrix4f inv_trans = (view * model).inverse().transpose();
         Eigen::Vector4f n[] = {
                 inv_trans * to_vec4(t->normal[0], 0.0f),
@@ -280,6 +283,55 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
     // Use: Instead of passing the triangle's color directly to the frame buffer, pass the color to the shaders first to get the final color;
     // Use: auto pixel_color = fragment_shader(payload);
 
+    auto v = t.toVector4();
+    int min_x = INT_MAX;
+    int max_x = INT_MIN;
+    int min_y = INT_MAX;
+    int max_y = INT_MIN;
+    for (auto point: v) {
+        if(point[0] < min_x) min_x = point[0];
+        if(point[0] > max_x) max_x = ceil(point[0]);
+        if(point[1] < min_y) min_y = point[1];
+        if(point[1] > max_y) max_y = ceil(point[1]);
+    }
+    for (int x = min_x; x < max_x; x++) {
+        for (int y = min_y; y < max_y; y++) {
+            if (SSAA) {}
+            else {
+                if(insideTriangle((float)x + 0.5, (float)y + 0.5, t.v)) {
+                    // 得到这个点的重心坐标
+                    auto barycentric = computeBarycentric2D((float)x + 0.5, (float)y + 0.5, t.v);
+                    float alpha = std::get<0>(barycentric);
+                    float beta = std::get<1>(barycentric);
+                    float gamma = std::get<2>(barycentric);
+
+                    // z-buffer插值
+                    float w_reciprocal = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w()); // 归一化系数
+                    float z_interpolated = 
+                        alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                    z_interpolated *= w_reciprocal;
+
+                    if (abs(z_interpolated) < depth_buf[get_index(x, y)]) { // todo:删掉abs
+                        Eigen::Vector2i p = {x, y};
+                        // 颜色插值
+                        auto interpolated_color = interpolate(alpha, beta, gamma, t.color[0], t.color[1], t.color[2], 1.0);
+                        // 法向量插值
+                        auto interpolated_normal = interpolate(alpha, beta, gamma, t.normal[0], t.normal[1], t.normal[2], 1.0);
+                        // 纹理坐标插值
+                        auto interpolated_texcoords = interpolate(alpha, beta, gamma, t.tex_coords[0], t.tex_coords[1], t.tex_coords[2], 1.0);
+                        // 视角空间坐标插值
+                        auto interpolated_shadingcoords = interpolate(alpha, beta, gamma, view_pos[0], view_pos[1], view_pos[2], 1.0);
+
+                        fragment_shader_payload payload(interpolated_color, interpolated_normal.normalized(), interpolated_texcoords, texture ? &*texture : nullptr);
+                        payload.view_pos = interpolated_shadingcoords;
+                        auto pixel_color = fragment_shader(payload);
+                        set_pixel(p, pixel_color);
+                        depth_buf[get_index(x, y)] = abs(z_interpolated); // todo:删掉abs
+                    }
+                }
+            }
+        }
+    }
  
 }
 
@@ -303,10 +355,20 @@ void rst::rasterizer::clear(rst::Buffers buff)
     if ((buff & rst::Buffers::Color) == rst::Buffers::Color)
     {
         std::fill(frame_buf.begin(), frame_buf.end(), Eigen::Vector3f{0, 0, 0});
+        // 存储小像素的颜色
+        for (int i = 0; i<frame_buf_2xSSAA.size(); i++) {
+            frame_buf_2xSSAA[i].resize(4);
+            std::fill(frame_buf_2xSSAA[i].begin(), frame_buf_2xSSAA[i].end(), Eigen::Vector3f{0, 0, 0});
+        }
     }
     if ((buff & rst::Buffers::Depth) == rst::Buffers::Depth)
     {
         std::fill(depth_buf.begin(), depth_buf.end(), std::numeric_limits<float>::infinity());
+        // 存储小像素的深度
+        for (int i = 0; i<depth_buf_2xSSAA.size(); i++) {
+            depth_buf_2xSSAA[i].resize(4);
+            std::fill(depth_buf_2xSSAA[i].begin(), depth_buf_2xSSAA[i].end(), std::numeric_limits<float>::infinity());
+        }
     }
 }
 
@@ -314,6 +376,10 @@ rst::rasterizer::rasterizer(int w, int h) : width(w), height(h)
 {
     frame_buf.resize(w * h);
     depth_buf.resize(w * h);
+
+    // SSAA超采样，每个像素划分为4个小像素
+    frame_buf_2xSSAA.resize(w * h);
+    depth_buf_2xSSAA.resize(w * h);
 
     texture = std::nullopt;
 }

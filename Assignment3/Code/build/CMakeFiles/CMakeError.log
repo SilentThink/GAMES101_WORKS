@@ -12,18 +12,18 @@ clang++: error: linker command failed with exit code 1 (use -v to see invocation
 Determining if the CXX compiler works failed with the following output:
 Change Dir: /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_0dbfb/fast && /usr/bin/make -f CMakeFiles/cmTC_0dbfb.dir/build.make CMakeFiles/cmTC_0dbfb.dir/build
+Run Build Command(s):/usr/bin/make cmTC_38f68/fast && /usr/bin/make -f CMakeFiles/cmTC_38f68.dir/build.make CMakeFiles/cmTC_38f68.dir/build
 make[1]: Entering directory '/home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/build/CMakeFiles/CMakeTmp'
-Building CXX object CMakeFiles/cmTC_0dbfb.dir/testCXXCompiler.cxx.o
-/usr/bin/clang++     -o CMakeFiles/cmTC_0dbfb.dir/testCXXCompiler.cxx.o -c /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTC_0dbfb
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0dbfb.dir/link.txt --verbose=1
-/usr/bin/clang++       CMakeFiles/cmTC_0dbfb.dir/testCXXCompiler.cxx.o  -o cmTC_0dbfb 
+Building CXX object CMakeFiles/cmTC_38f68.dir/testCXXCompiler.cxx.o
+/usr/bin/clang++     -o CMakeFiles/cmTC_38f68.dir/testCXXCompiler.cxx.o -c /home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/build/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTC_38f68
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_38f68.dir/link.txt --verbose=1
+/usr/bin/clang++       CMakeFiles/cmTC_38f68.dir/testCXXCompiler.cxx.o  -o cmTC_38f68 
 /usr/bin/ld: cannot find -lstdc++
 clang++: error: linker command failed with exit code 1 (use -v to see invocation)
-make[1]: *** [CMakeFiles/cmTC_0dbfb.dir/build.make:87: cmTC_0dbfb] Error 1
+make[1]: *** [CMakeFiles/cmTC_38f68.dir/build.make:87: cmTC_38f68] Error 1
 make[1]: Leaving directory '/home/zwt/homework/ComputerGraphics/GAMES101/Assignment3/Code/build/CMakeFiles/CMakeTmp'
-make: *** [Makefile:121: cmTC_0dbfb/fast] Error 2
+make: *** [Makefile:121: cmTC_38f68/fast] Error 2
 
 
 
